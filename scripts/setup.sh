@@ -4,6 +4,8 @@
 
 set -e
 
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # scrapling 바이너리 경로 탐지
 find_scrapling() {
     # 1. PATH에 있는지
@@ -59,6 +61,7 @@ case "$ACTION" in
     install)
         echo "Scrapling 설치를 시작합니다..."
         pip3 install "scrapling[all]" 2>&1 | tail -5
+        pip3 install -e "${SKILL_DIR}" 2>&1 | tail -5
 
         SCRAPLING_BIN=$(find_scrapling 2>/dev/null) || true
         if [ -z "$SCRAPLING_BIN" ]; then
