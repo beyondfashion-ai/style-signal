@@ -25,3 +25,8 @@ env/
 *.log
 tmp/
 .cache/
+
+# 에이전트/툴 작업 디렉토리
+.codex/
+.omx/
+.omc/
