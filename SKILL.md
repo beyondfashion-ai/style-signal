@@ -83,31 +83,23 @@ SCRAPLING_BIN=$(bash "${SKILL_DIR}/scripts/setup.sh" path)
 ### Step 2: URL 조합 + 크롤링 실행
 **타입**: script
 
-사용자 선택에 따라 URL을 조합하고 크롤링을 실행한다.
+사용자 선택에 따라 Python CLI로 URL 조합, 크롤링, 1차 파싱을 실행한다.
 
-**방식 A: 키워드 검색**
+**방식 A: 키워드 검색**은 `--keyword "{키워드}"`를 사용한다.
+**방식 B: TOP 100 큐레이션**은 `--curation top100`을 사용한다.
 
-```
-URL 패턴: https://kream.co.kr/search?keyword={키워드}&tab=products&sort={정렬}
-```
-
-정렬 파라미터 매핑:
-- 남성 인기순: `male_popularity`
-- 여성 인기순: `female_popularity`
-- 추천순: `recommend`
-- 프리미엄 낮은순: `pricepremium[asc]`
-
-**방식 B: TOP 100 큐레이션**
-
-```
-남성 TOP100: https://kream.co.kr/exhibitions/15243
-여성 TOP100: https://kream.co.kr/exhibitions/15242
-```
-
-크롤링 실행:
+크롤링 실행 예시:
 
 ```bash
-bash "${SKILL_DIR}/scripts/crawl.sh" "$SCRAPLING_BIN" "$URL" "${SKILL_DIR}/../../artifacts/kream-result.md" 40000
+python -m fashion_trend fetch \
+    --source kream \
+    --curation top100 \
+    --gender men \
+    --sort popular \
+    --limit 40 \
+    --raw-output "${SKILL_DIR}/../../artifacts/kream-result.md" \
+    --retry-on-block \
+    > "${SKILL_DIR}/../../artifacts/kream-result.json"
 ```
 
 결과 JSON의 `success`가 false이면:
@@ -118,7 +110,10 @@ bash "${SKILL_DIR}/scripts/crawl.sh" "$SCRAPLING_BIN" "$URL" "${SKILL_DIR}/../..
 ### Step 3: 데이터 파싱
 **타입**: prompt
 
-크롤링된 마크다운 파일을 Read로 읽고, 상품 데이터를 구조화한다.
+`artifacts/kream-result.json`을 Read로 읽고, JSON의 `products` 배열을 사용한다.
+수동 마크다운 파싱은 하지 않는다.
+
+`products`가 비어 있으면 디버깅용으로만 `artifacts/kream-result.md` 원본 마크다운을 확인한다.
 
 추출 대상:
 - 랭킹 번호 (TOP100의 경우)

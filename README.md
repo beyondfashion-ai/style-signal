@@ -85,16 +85,39 @@ KREAM에서 여자 가방 인기순 보여줘
 
 ---
 
+## Architecture
+
+`fashion_trend`는 공통 `SourceAdapter` 인터페이스를 통해 URL 생성, Scrapling fetch, markdown parsing을 분리한다.
+`registry.py`가 source name을 adapter class에 매핑하므로 새 소스는 `src/fashion_trend/sources/<name>/adapter.py`를 만들고 registry에 등록하면 된다.
+KREAM, Musinsa, 29CM은 Phase 1에서 URL builder와 parser가 동작하는 ready adapter다.
+SSENSE, Farfetch, Grailed, StyleShare는 등록만 된 stub이며 구현 요청 시 명확한 TODO를 반환한다.
+CLI는 `python -m fashion_trend list-sources`, `describe`, `fetch` 세 명령으로 안정적인 JSON을 stdout에 출력한다.
+
+| Source | Status |
+| --- | --- |
+| KREAM | ready |
+| Musinsa | ready |
+| 29CM | ready |
+| SSENSE | stub |
+| Farfetch | stub |
+| Grailed | stub |
+| StyleShare | stub |
+
+---
+
 ## File structure
 
 ```
 fashion-trend/
-├── README.md           # 이 파일
-├── LICENSE             # MIT
-├── SKILL.md            # 스킬 본체 (Claude Code가 읽는 프롬프트)
+├── README.md
+├── LICENSE
+├── SKILL.md
+├── pyproject.toml
+├── src/fashion_trend/  # Python CLI + adapter registry
+├── tests/              # offline unittest fixtures
 └── scripts/
-    ├── setup.sh        # Scrapling 설치 확인/자동 설치
-    └── crawl.sh        # KREAM 크롤링 실행 + 차단 감지
+    ├── setup.sh
+    └── crawl.sh        # backward-compatible wrapper
 ```
 
 ---
