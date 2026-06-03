@@ -1,0 +1,17 @@
+style-signal Notice
+===================
+
+This software is a web scraping and trend-signal analysis tool designed for
+personal learning, research, and open-source tooling experiments.
+
+Users are solely responsible for complying with the terms of service,
+robots.txt, rate limits, and applicable laws for any target website, including
+but not limited to KREAM, Musinsa, and 29CM.
+
+The authors do not endorse or encourage any use of this software that violates
+laws, regulations, or third-party terms. Generated reports or datasets may
+include third-party brands, product names, prices, links, and image URLs owned
+by their respective rightsholders.
+
+The project stores image URLs only. It must not download, cache, redistribute,
+or rehost product image bytes.

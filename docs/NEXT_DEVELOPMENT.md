@@ -8,10 +8,11 @@ was recreated as an independent public repository.
 - Public repo: `https://github.com/beyondfashion-ai/style-signal`
 - Local development worktree: `/home/beyondfashion/style-signal-dev`
 - Branch: `codex/style-signal-dev`
-- Core implementation: adapter-based Python CLI with `list-sources`, `describe`, and `fetch`.
+- Core implementation: adapter-based Python CLI with `list-sources`, `describe`, `fetch`, and `signal`.
 - Ready adapters: `kream`, `musinsa`, `29cm`.
 - Stub adapters: `ssense`, `farfetch`, `grailed`, `styleshare`.
-- Verification baseline: `python3 -m unittest discover tests` passes 11 tests.
+- KALEI-inspired public layer: deterministic brand frequency, price-band balance, source guard, evidence manifest hash.
+- Verification baseline: `python3 -m unittest discover tests` passes 15 tests.
 
 ## Priority 0 - OSS Credibility Cleanup
 
@@ -19,14 +20,14 @@ Goal: make the repository look clean and self-contained before larger feature wo
 
 Evidence:
 - `README.md` has been rewritten for the independent `beyondfashion-ai/style-signal` repository and now separates implemented features from planned features.
-- `LICENSE` contains MIT text plus an additional notice in the same file, which can make GitHub classify the license as "Other".
-- `docs/DATA.md` references `DATA_LICENSE`, but the file does not exist yet.
+- `LICENSE` now contains only MIT text.
+- `NOTICE` carries scraping/source-use responsibility notes.
+- `DATA_LICENSE` exists for CC BY-NC 4.0 data artifacts.
 - `docs/OPENSOURCE_ROADMAP.md` now uses independent-project language.
 
 Work:
 - Keep README clone URLs pointed at `https://github.com/beyondfashion-ai/style-signal.git`.
-- Move the extra scraping notice from `LICENSE` into a separate `NOTICE` file.
-- Add `DATA_LICENSE` for CC BY-NC 4.0 dataset artifacts.
+- Keep `LICENSE`, `NOTICE`, and `DATA_LICENSE` split by responsibility.
 - Keep roadmap wording aligned with the independent-project status.
 - Add a short "Project Status" section that honestly separates implemented features from planned features.
 
@@ -82,7 +83,7 @@ Goal: turn one-off fetches into an actual open trend dataset.
 Evidence:
 - `docs/PHASE3_TIMESERIES_API.md` defines SQLite tables, `store`, `query`, and `serve`.
 - `docs/DATA.md` defines the data contract, but no storage module exists.
-- KALEI has proven internal patterns for brand frequency, hot brands, and style signal summaries in `src/fashionTrend.js`.
+- KALEI has proven internal patterns for brand frequency, hot brands, and style signal summaries in `src/fashionTrend.js`; the first deterministic single-snapshot signal layer now exists in `src/fashion_trend/signals.py`.
 
 Work:
 - Add `src/fashion_trend/storage/` with schema bootstrap, snapshot upsert, and read queries.
@@ -102,20 +103,16 @@ Goal: make generated reports auditable and harder to overclaim.
 
 Evidence:
 - KALEI has deterministic source suitability filtering, source truth checks, visual truth checks, and evidence manifests.
-- `style-signal` currently stores product fields but has no claim/evidence layer for report text.
+- `style-signal signal` now emits source refs, supported brand/price claims, source guard issues, and a stable manifest hash.
 
 Work:
-- Reimplement a small, generic Python version rather than copying KALEI code directly.
-- Add `src/fashion_trend/evidence/` with:
-  - source refs derived from products and fetch metadata
-  - claim snippets for brands, products, prices, rankings, categories, and visual terms
-  - manifest hash bound to report body text
-  - severity levels: `supported`, `review_required`, `unsupported`
-- Add report footer JSON or sidecar `.manifest.json`.
+- Extend the current `src/fashion_trend/signals.py` layer into report generation once `report` exists.
+- Add visual/tag evidence after Phase 2 tagging creates `ProductTags`.
+- Bind report body text to the existing manifest hash when `report --manifest-output` lands.
 
 Acceptance:
-- Offline tests prove manifest hash changes when report text changes.
-- Unsupported price/rank/brand claims are detectable from fixture text.
+- Offline tests prove manifest hash changes when source evidence changes.
+- Unsupported price/rank/brand claims are detectable from fixture text after `report` exists.
 - Report command can emit `--manifest-output`.
 
 ## Priority 5 - Adapter Expansion And Hardening
@@ -157,8 +154,8 @@ Acceptance:
 ## Recommended First Sprint
 
 1. OSS credibility cleanup.
-2. Add a dependency-free `report` command.
+2. Add a dependency-free `report` command using `signal` output and manifest refs.
 3. Implement SQLite `store` plus `query rising-brands`.
 
 This gives the project a stronger public story quickly: real install docs, real standalone reports,
-and real historical trend analysis without paid services.
+auditable trend signals, and real historical trend analysis without paid services.

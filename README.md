@@ -2,11 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg)](./pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-11%20offline%20unittest-green.svg)](./tests)
+[![Tests](https://img.shields.io/badge/tests-15%20offline%20unittest-green.svg)](./tests)
 
 A pluggable fashion trend signal crawler with a Claude Code skill layer.
 
-`style-signal` is an adapter-based Python CLI for collecting public fashion ranking/search pages and returning normalized JSON. The core package currently supports KREAM, Musinsa, and 29CM adapters. The Claude Code skill in this repo can sit on top of that JSON and generate an editorial HTML trend report from natural-language Korean prompts.
+`style-signal` is an adapter-based Python CLI for collecting public fashion ranking/search pages, returning normalized JSON, and turning that data into deterministic style signals. The core package currently supports KREAM, Musinsa, and 29CM adapters. The Claude Code skill in this repo can sit on top of that JSON and generate an editorial HTML trend report from natural-language Korean prompts.
 
 한국어 요약: KREAM, Musinsa, 29CM 랭킹/검색 데이터를 공통 JSON으로 수집하는 공개 패션 트렌드 CLI이며, Claude Code 스킬 레이어를 통해 자연어 요청 기반 HTML 리포트까지 자동화할 수 있습니다.
 
@@ -14,12 +14,13 @@ A pluggable fashion trend signal crawler with a Claude Code skill layer.
 
 | Area | Status | Notes |
 | --- | --- | --- |
-| CLI | Implemented | `list-sources`, `describe`, `fetch` |
+| CLI | Implemented | `list-sources`, `describe`, `fetch`, `signal` |
 | Output contract | Implemented | Stable JSON to stdout; exit code signals success/failure |
 | Ready adapters | Implemented | `kream`, `musinsa`, `29cm` |
 | Stub adapters | Scaffolded | `ssense`, `farfetch`, `grailed`, `styleshare` return clear TODO errors |
 | Fetching | Implemented | Scrapling `stealthy-fetch`, block detection, optional one-time retry |
-| Tests | Implemented | 11 offline `unittest` cases; no network calls in test suite |
+| Style signal analysis | Implemented | Brand frequency, price-band balance, source guard, evidence manifest |
+| Tests | Implemented | 15 offline `unittest` cases; no network calls in test suite |
 | Claude Code skill | Implemented | Natural-language workflow in [`SKILL.md`](./SKILL.md) |
 | Static HTML `report` command | Planned | Spec/backlog only; not a core CLI command yet |
 | Vision/style tagging | Planned | See [`docs/PHASE2_VISION_TAGGING.md`](./docs/PHASE2_VISION_TAGGING.md) |
@@ -63,6 +64,23 @@ style-signal fetch \
   --retry-on-block
 ```
 
+Build a deterministic style-signal summary from saved fetch JSON:
+
+```bash
+mkdir -p artifacts
+
+style-signal fetch \
+  --source kream \
+  --curation top100 \
+  --gender men \
+  --limit 40 \
+  > artifacts/kream-result.json
+
+style-signal signal \
+  --input artifacts/kream-result.json \
+  --manifest-output artifacts/kream-result.manifest.json
+```
+
 The same commands can also be run through the module entrypoint:
 
 ```bash
@@ -73,7 +91,7 @@ python -m fashion_trend fetch --source 29cm --keyword sneakers --limit 20
 
 The legacy `fashion-trend` console script remains available as an alias during the rename.
 
-`fetch` writes normalized JSON to stdout. If `--raw-output` is omitted, fetched markdown is stored under `artifacts/<source>-result.md` for debugging.
+`fetch` writes normalized JSON to stdout. If `--raw-output` is omitted, fetched markdown is stored under `artifacts/<source>-result.md` for debugging. `signal` reads that JSON and returns brand signals, price-band balance, source-quality scores, and an evidence manifest hash.
 
 ## Use As A Claude Code Skill
 
@@ -127,6 +145,7 @@ src/fashion_trend/
 ├── fetcher.py              # Scrapling wrapper
 ├── registry.py             # source name -> adapter class
 ├── schema.py               # Query, Product, FetchResult
+├── signals.py              # deterministic style-signal scoring + manifest
 └── sources/
     ├── base.py             # SourceAdapter contract
     ├── kream/
@@ -139,6 +158,8 @@ src/fashion_trend/
 ```
 
 To add a source, create `src/fashion_trend/sources/<name>/adapter.py`, implement URL building, block detection, and markdown parsing, then register the adapter in `registry.py`. See [`docs/ADAPTERS.md`](./docs/ADAPTERS.md) for the contribution checklist.
+
+The signal layer borrows the public-safe parts of KALEI's internal trend stack: deterministic brand frequency, source-quality gating, score rebalancing, and evidence manifests. It does not copy KALEI private data, Firebase logic, or content-generation workflows. See [`docs/SIGNALS.md`](./docs/SIGNALS.md).
 
 ## Development
 
@@ -172,7 +193,7 @@ Near-term backlog:
 1. Clean OSS metadata and docs for the independent `beyondfashion-ai/style-signal` repo.
 2. Add a dependency-free `report` command that renders static HTML from fetch JSON.
 3. Add SQLite snapshot storage and `query rising-brands` before introducing an API server.
-4. Reimplement generic evidence manifests and source-truth guards inspired by KALEI, without carrying private code or private data into this repo.
+4. Extend the KALEI-inspired signal layer with SQLite historical comparison and rising-brand queries.
 5. Promote one global stub adapter, likely `ssense`, to ready status.
 
 See [`docs/NEXT_DEVELOPMENT.md`](./docs/NEXT_DEVELOPMENT.md) and [`docs/OPENSOURCE_ROADMAP.md`](./docs/OPENSOURCE_ROADMAP.md) for the working backlog.
@@ -185,7 +206,8 @@ This project is intended for personal learning, research, and open-source toolin
 - Do not run high-volume or abusive scraping workloads.
 - Store image URLs only; do not redistribute image bytes or product media assets.
 - Generated reports or datasets may include third-party brands, product names, images, prices, and links owned by their respective rightsholders.
-- The code is MIT licensed. A separate dataset/output license is planned before publishing reusable dataset artifacts.
+- The code is MIT licensed. Data artifacts are licensed separately under [`DATA_LICENSE`](./DATA_LICENSE).
+- Additional scraping and source-use notices live in [`NOTICE`](./NOTICE).
 
 In short: use this as a responsible research tool, not as a way to republish or commercialize scraped third-party content.
 

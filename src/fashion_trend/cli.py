@@ -7,6 +7,7 @@ import time
 from .fetcher import FetcherNotInstalled, stealthy_fetch
 from .registry import get_adapter, list_sources
 from .schema import FetchResult, Query
+from .signals import build_signal_report
 
 
 def _print_json(payload: dict | list) -> None:
@@ -173,6 +174,35 @@ def cmd_fetch(args: argparse.Namespace) -> int:
     return 0 if result.success else 1
 
 
+def cmd_signal(args: argparse.Namespace) -> int:
+    try:
+        payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    except OSError as exc:
+        _print_json({"success": False, "error": "INPUT_READ_FAILED", "message": str(exc)})
+        return 1
+    except json.JSONDecodeError as exc:
+        _print_json({"success": False, "error": "INPUT_JSON_INVALID", "message": str(exc)})
+        return 1
+
+    if not isinstance(payload, dict):
+        _print_json({"success": False, "error": "INPUT_JSON_INVALID", "message": "input JSON must be an object"})
+        return 1
+
+    report = build_signal_report(payload, top_limit=max(1, args.top))
+
+    if args.manifest_output:
+        manifest_path = Path(args.manifest_output)
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(
+            json.dumps(report["manifest"], ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        report["manifest"]["path"] = str(manifest_path)
+
+    _print_json(report)
+    return 0 if report["success"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="style-signal")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -201,6 +231,12 @@ def build_parser() -> argparse.ArgumentParser:
     fetch_parser.add_argument("--scrapling-bin")
     fetch_parser.add_argument("--retry-on-block", action="store_true")
     fetch_parser.set_defaults(func=cmd_fetch)
+
+    signal_parser = subparsers.add_parser("signal")
+    signal_parser.add_argument("--input", required=True, help="FetchResult JSON file from the fetch command.")
+    signal_parser.add_argument("--manifest-output", help="Optional path for the evidence manifest JSON sidecar.")
+    signal_parser.add_argument("--top", type=int, default=10, help="Maximum top brands/evidence refs to return.")
+    signal_parser.set_defaults(func=cmd_signal)
 
     return parser
 

@@ -1,0 +1,23 @@
+style-signal Data Artifact License
+==================================
+
+Data artifacts produced by this project, including shared SQLite snapshots,
+JSON exports, and derived non-code datasets, are licensed under the Creative
+Commons Attribution-NonCommercial 4.0 International Public License (CC BY-NC
+4.0).
+
+Canonical license URL:
+https://creativecommons.org/licenses/by-nc/4.0/
+
+You may use shared data artifacts for personal learning, academic research,
+non-commercial analysis, and non-commercial visualization.
+
+You may not sell the data artifacts, resell access to them, include them in a
+commercial product or service, or use them to train commercial machine-learning
+models without a separate license from the project owner.
+
+This data license does not grant rights to third-party brands, product media,
+product names, source-site content, or trademarks referenced by the artifacts.
+Those remain owned by their respective rightsholders.
+
+Project source code remains licensed under MIT. See LICENSE.
