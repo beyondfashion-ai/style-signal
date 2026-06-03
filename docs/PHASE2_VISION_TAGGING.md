@@ -15,7 +15,7 @@ After a fetch, optionally tag each product's image with style / color / silhouet
 
 ## Data changes
 
-Extend `Product` in `src/fashion_trend/schema.py`:
+Extend `Product` in `src/style_signal/schema.py`:
 
 ```python
 @dataclass
@@ -40,7 +40,7 @@ Keep backward compat: `tags=None` when tagging is disabled. JSON output must ski
 ## Module layout (additions only)
 
 ```
-src/fashion_trend/
+src/style_signal/
 ├── tagging/
 │   ├── __init__.py
 │   ├── base.py            # Tagger ABC
@@ -113,7 +113,7 @@ Extend `fetch` with two flags:
 And a new standalone command:
 
 ```
-python -m fashion_trend tag \
+python -m style_signal tag \
     --input artifacts/kream-result.json \
     --output artifacts/kream-result.tagged.json \
     --limit 20
@@ -128,7 +128,7 @@ Add a new optional sub-step between current Step 4 and Step 5:
 > **Step 4.5 — 스타일 태깅 (선택, GEMINI_API_KEY 있을 때만)**
 >
 > ```bash
-> python -m fashion_trend tag --input kream-result.json --output kream-result.tagged.json --limit 20
+> python -m style_signal tag --input kream-result.json --output kream-result.tagged.json --limit 20
 > ```
 >
 > `tags` 필드가 채워져 있으면 Step 5 인사이트 프롬프트에 "스타일/색/실루엣 태그를 근거로 본 트렌드 요약" 지시를 추가한다.
@@ -146,9 +146,9 @@ No live network tests. Keep CI offline.
 ## Acceptance criteria
 
 1. `pip install -e ".[tagging]"` installs `google-genai`; plain `pip install -e .` does not.
-2. `python -m fashion_trend fetch --source kream --curation top100 --gender men --tag --tag-limit 5` returns JSON where first 5 products have `tags` populated (given a valid `GEMINI_API_KEY`); remaining products have `tags: null`.
+2. `python -m style_signal fetch --source kream --curation top100 --gender men --tag --tag-limit 5` returns JSON where first 5 products have `tags` populated (given a valid `GEMINI_API_KEY`); remaining products have `tags: null`.
 3. With `GEMINI_API_KEY` unset, the same command still succeeds — all products have `tags: null`, one stderr warning is printed, exit 0.
-4. `python -m fashion_trend tag --input X --output Y` works standalone and is idempotent on re-run.
+4. `python -m style_signal tag --input X --output Y` works standalone and is idempotent on re-run.
 5. Tests pass offline via `python -m unittest discover tests`.
 6. No new required dependency in the core install.
 

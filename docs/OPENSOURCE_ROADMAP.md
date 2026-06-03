@@ -1,6 +1,6 @@
 # style-signal Open-Source Roadmap
 
-> This independent project turns a KREAM-first Claude Code skill into a pluggable, open, free-to-run fashion trend signal toolkit.
+> This independent project turns a KREAM-first Claude Code skill into a pluggable, open, free-to-run style signal toolkit.
 
 ## Scope (locked)
 
@@ -45,8 +45,8 @@ Only three items from the original brainstorm ship. Everything else is explicitl
 Between phases, run:
 
 ```bash
-python -m fashion_trend list-sources
-python -m fashion_trend describe --source kream
+python -m style_signal list-sources
+python -m style_signal describe --source kream
 python -m unittest discover tests
 ```
 

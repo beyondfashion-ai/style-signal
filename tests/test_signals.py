@@ -6,8 +6,8 @@ import tempfile
 import unittest
 
 import _path  # noqa: F401
-from fashion_trend.cli import main
-from fashion_trend.signals import build_signal_report
+from style_signal.cli import main
+from style_signal.signals import build_signal_report
 
 
 def fetch_payload(products):

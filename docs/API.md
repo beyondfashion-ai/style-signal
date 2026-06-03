@@ -6,7 +6,7 @@ Phase 3 adds an optional FastAPI server exposing the SQLite snapshot database as
 
 ```bash
 pip install -e ".[api]"
-python -m fashion_trend serve --host 0.0.0.0 --port 8787
+python -m style_signal serve --host 0.0.0.0 --port 8787
 ```
 
 `--db PATH` overrides the default `./data/style_signal.sqlite`. `STYLE_SIGNAL_DB` env var has the same effect.

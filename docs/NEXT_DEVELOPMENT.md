@@ -42,7 +42,7 @@ Goal: remove the gap between README/SKILL promises and actual package behavior.
 
 Evidence:
 - README now positions HTML report generation as the Claude/Codex skill layer, not the core CLI.
-- `src/fashion_trend/cli.py` currently implements only `list-sources`, `describe`, and `fetch`.
+- `src/style_signal/cli.py` currently implements only `list-sources`, `describe`, and `fetch`.
 - `SKILL.md` can generate an HTML report through the host agent, but the Python package itself does not expose `report`.
 
 Work:
@@ -51,7 +51,7 @@ Work:
 - Keep it dependency-free with a small standard-library HTML renderer.
 
 Acceptance:
-- `python3 -m fashion_trend report --input artifacts/example.json --output trend-report/example.html` works with a fixture.
+- `python3 -m style_signal report --input artifacts/example.json --output trend-report/example.html` works with a fixture.
 - Offline test verifies the report includes product names, images, ranks, prices, and source links.
 - README examples match real commands.
 
@@ -61,12 +61,12 @@ Goal: add optional style tagging without changing the core install footprint.
 
 Evidence:
 - `docs/PHASE2_VISION_TAGGING.md` specifies `ProductTags`, `Product.tags`, `--tag`, `--tag-limit`, and a standalone `tag` command.
-- `src/fashion_trend/schema.py` has `Product`, but no `ProductTags` or `tags` field.
+- `src/style_signal/schema.py` has `Product`, but no `ProductTags` or `tags` field.
 - `pyproject.toml` has no optional dependency group yet.
 
 Work:
 - Add `ProductTags` and optional `tags` to `Product`.
-- Add `src/fashion_trend/tagging/` with base tagger, prompt template, JSON parser, and Gemini implementation.
+- Add `src/style_signal/tagging/` with base tagger, prompt template, JSON parser, and Gemini implementation.
 - Add optional dependency group: `tagging = ["google-genai>=0.3"]`.
 - Add `tag` command and `fetch --tag --tag-limit`.
 - Missing `GEMINI_API_KEY` should warn to stderr and leave `tags=None`; it must not fail fetch.
@@ -83,10 +83,10 @@ Goal: turn one-off fetches into an actual open trend dataset.
 Evidence:
 - `docs/PHASE3_TIMESERIES_API.md` defines SQLite tables, `store`, `query`, and `serve`.
 - `docs/DATA.md` defines the data contract, but no storage module exists.
-- KALEI has proven internal patterns for brand frequency, hot brands, and style signal summaries in `src/fashionTrend.js`; the first deterministic single-snapshot signal layer now exists in `src/fashion_trend/signals.py`.
+- KALEI has proven internal patterns for brand frequency, hot brands, and style signal summaries in `src/fashionTrend.js`; the first deterministic single-snapshot signal layer now exists in `src/style_signal/signals.py`.
 
 Work:
-- Add `src/fashion_trend/storage/` with schema bootstrap, snapshot upsert, and read queries.
+- Add `src/style_signal/storage/` with schema bootstrap, snapshot upsert, and read queries.
 - Add `store` command for fetch JSON.
 - Add `query rising-brands`, `query new-brands`, `query brand-history`, and `query snapshots`.
 - Make `query_json` exclude `limit`, matching the Phase 3 spec.
@@ -106,7 +106,7 @@ Evidence:
 - `style-signal signal` now emits source refs, supported brand/price claims, source guard issues, and a stable manifest hash.
 
 Work:
-- Extend the current `src/fashion_trend/signals.py` layer into report generation once `report` exists.
+- Extend the current `src/style_signal/signals.py` layer into report generation once `report` exists.
 - Add visual/tag evidence after Phase 2 tagging creates `ProductTags`.
 - Bind report body text to the existing manifest hash when `report --manifest-output` lands.
 

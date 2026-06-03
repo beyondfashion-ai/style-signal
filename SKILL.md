@@ -1,6 +1,6 @@
 ---
 name: style-signal
-description: This skill should be used when the user asks to "요즘 뭐가 인기야", "패션 트렌드 알려줘", "크림 인기 상품", "KREAM 트렌드", "신발 트렌드", "인기 스니커즈", "남자 인기 상품", "여자 인기 상품", "트렌드 리포트 만들어줘", "fashion trend", or "style signal". KREAM 크롤링으로 실시간 패션 트렌드 신호를 수집하고 이미지 포함 HTML 리포트를 자동 생성합니다. Make sure to use this skill whenever the user mentions fashion trends, style signals, popular items, KREAM, or trend reports.
+description: This skill should be used when the user asks to "요즘 뭐가 인기야", "패션 트렌드 알려줘", "크림 인기 상품", "KREAM 트렌드", "신발 트렌드", "인기 스니커즈", "남자 인기 상품", "여자 인기 상품", "트렌드 리포트 만들어줘", or "style signal". KREAM 크롤링으로 실시간 패션 트렌드 신호를 수집하고 이미지 포함 HTML 리포트를 자동 생성합니다. Make sure to use this skill whenever the user mentions style signals, popular items, KREAM, or trend reports.
 ---
 
 # 패션 트렌드 큐레이션
@@ -91,7 +91,7 @@ SCRAPLING_BIN=$(bash "${SKILL_DIR}/scripts/setup.sh" path)
 크롤링 실행 예시:
 
 ```bash
-python -m fashion_trend fetch \
+python -m style_signal fetch \
     --source kream \
     --curation top100 \
     --gender men \

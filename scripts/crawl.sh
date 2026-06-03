@@ -1,6 +1,6 @@
 #!/bin/bash
 # style-signal 스킬 — KREAM 크롤링 실행 스크립트
-# Deprecated: use `python -m fashion_trend fetch` for new flows. This wrapper
+# Deprecated: use `python -m style_signal fetch` for new flows. This wrapper
 # is kept for backward compatibility with existing SKILL.md detail fetches.
 # Usage: crawl.sh <scrapling_path> <url> <output_file> [timeout]
 

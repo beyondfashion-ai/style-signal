@@ -35,9 +35,9 @@ style-signal/
 ├── scripts/
 │   ├── setup.sh                # extended — also pip install -e .
 │   └── crawl.sh                # KEEP as deprecated thin wrapper (BC)
-├── src/fashion_trend/
+├── src/style_signal/
 │   ├── __init__.py
-│   ├── __main__.py             # entry for `python -m fashion_trend`
+│   ├── __main__.py             # entry for `python -m style_signal`
 │   ├── cli.py                  # argparse CLI (fetch / list-sources / describe)
 │   ├── schema.py               # Query, Product, FetchResult dataclasses
 │   ├── registry.py             # name -> adapter class
@@ -77,7 +77,7 @@ style-signal/
     └── test_kream_parser.py
 ```
 
-## Data schemas (`src/fashion_trend/schema.py`)
+## Data schemas (`src/style_signal/schema.py`)
 
 ```python
 from dataclasses import dataclass, field
@@ -131,7 +131,7 @@ class FetchResult:
 
 `FetchResult.to_json()` must return a dict that JSON-serializes cleanly (include nested `query` and `products`).
 
-## Adapter base (`src/fashion_trend/sources/base.py`)
+## Adapter base (`src/style_signal/sources/base.py`)
 
 ```python
 from abc import ABC, abstractmethod
@@ -161,7 +161,7 @@ class SourceAdapter(ABC):
         return None
 ```
 
-## Fetcher (`src/fashion_trend/fetcher.py`)
+## Fetcher (`src/style_signal/fetcher.py`)
 
 Thin wrapper around `scrapling extract stealthy-fetch`. Replaces the logic currently in `scripts/crawl.sh`.
 
@@ -182,7 +182,7 @@ def stealthy_fetch(
 - Auto-discover `scrapling` binary: try `shutil.which("scrapling")`, then `~/Library/Python/3.{11,12,13}/bin/scrapling`, then `~/.local/bin/scrapling`. If not found, raise `FetcherNotInstalled`.
 - On subprocess error, still check if output file exists (scrapling sometimes exits non-zero but writes partial output).
 
-## Registry (`src/fashion_trend/registry.py`)
+## Registry (`src/style_signal/registry.py`)
 
 ```python
 from .sources.base import SourceAdapter
@@ -207,14 +207,14 @@ def list_sources() -> list[str]:
     return sorted(_ADAPTERS.keys())
 ```
 
-## CLI (`src/fashion_trend/cli.py`)
+## CLI (`src/style_signal/cli.py`)
 
 Commands:
 
 ```
-python -m fashion_trend list-sources
-python -m fashion_trend describe --source kream
-python -m fashion_trend fetch \
+python -m style_signal list-sources
+python -m style_signal describe --source kream
+python -m style_signal fetch \
     --source kream \
     [--keyword "러닝화" | --category shoes | --curation top100] \
     [--gender men|women|unisex] \
@@ -341,27 +341,26 @@ Add a top-level `status` field to the `describe` output: `"ready"` for kream/mus
 [project]
 name = "style-signal"
 version = "0.2.0"
-description = "Open fashion trend signal crawler + report skill"
+description = "Open style signal crawler + report skill"
 requires-python = ">=3.11"
 dependencies = [
     "scrapling[all]>=0.3",
 ]
 
 [project.scripts]
-style-signal = "fashion_trend.cli:main"
-fashion-trend = "fashion_trend.cli:main"
+style-signal = "style_signal.cli:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fashion_trend"]
+packages = ["src/style_signal"]
 ```
 
 ## `scripts/setup.sh` changes
 
-After scrapling install, run `pip3 install -e "${SKILL_DIR}"` so `python -m fashion_trend` works from anywhere. Keep `check` / `install` / `path` action contract.
+After scrapling install, run `pip3 install -e "${SKILL_DIR}"` so `python -m style_signal` works from anywhere. Keep `check` / `install` / `path` action contract.
 
 ## `scripts/crawl.sh` changes
 
@@ -374,7 +373,7 @@ Only Steps 2 and 3 change meaningfully.
 **Step 2 (new):**
 
 ```bash
-python -m fashion_trend fetch \
+python -m style_signal fetch \
     --source kream \
     --curation top100 \         # OR --keyword "..."
     --gender men \
@@ -404,9 +403,9 @@ Run with `python -m unittest discover tests` (no pytest dependency).
 
 ## Acceptance criteria
 
-1. `python -m fashion_trend list-sources` → `kream`
-2. `python -m fashion_trend describe --source kream` → JSON with `supported_categories`, `supported_genders`, `supported_sorts`, `supported_curations`
-3. `python -m fashion_trend fetch --source kream --curation top100 --gender men --limit 10` → exits 0 with JSON `{success: true, products: [...]}` when network works; exits 1 with `{success: false, error: "BLOCKED"|"EMPTY_RESULT"}` when blocked. (Manual verification only — no network test in CI.)
+1. `python -m style_signal list-sources` → `kream`
+2. `python -m style_signal describe --source kream` → JSON with `supported_categories`, `supported_genders`, `supported_sorts`, `supported_curations`
+3. `python -m style_signal fetch --source kream --curation top100 --gender men --limit 10` → exits 0 with JSON `{success: true, products: [...]}` when network works; exits 1 with `{success: false, error: "BLOCKED"|"EMPTY_RESULT"}` when blocked. (Manual verification only — no network test in CI.)
 4. `python -m unittest discover tests` → all green.
 5. `bash scripts/crawl.sh /path/to/scrapling URL out.md 40000` still works unchanged (BC).
 6. `SKILL.md` Step 2/3 updated to new CLI; other steps untouched.
@@ -417,7 +416,7 @@ Run with `python -m unittest discover tests` (no pytest dependency).
 
 One commit per logical chunk, conventional commit style:
 
-- `feat(core): add fashion_trend package skeleton and schemas`
+- `feat(core): add style_signal package skeleton and schemas`
 - `feat(core): add SourceAdapter base + registry`
 - `feat(kream): port KREAM logic into adapter`
 - `feat(cli): add fetch/list-sources/describe commands`

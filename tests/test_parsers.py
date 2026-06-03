@@ -2,10 +2,10 @@ from pathlib import Path
 import unittest
 
 import _path  # noqa: F401
-from fashion_trend.schema import Query
-from fashion_trend.sources.kream.parser import parse_kream_markdown
-from fashion_trend.sources.musinsa.parser import parse_musinsa_markdown
-from fashion_trend.sources.twentyninecm.parser import parse_twentyninecm_markdown
+from style_signal.schema import Query
+from style_signal.sources.kream.parser import parse_kream_markdown
+from style_signal.sources.musinsa.parser import parse_musinsa_markdown
+from style_signal.sources.twentyninecm.parser import parse_twentyninecm_markdown
 
 
 FIXTURES = Path(__file__).parent / "fixtures"

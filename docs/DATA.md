@@ -117,7 +117,7 @@ DELETE FROM snapshots WHERE fetch_date < date('now', '-90 days');
 ## Consuming the data
 
 - **SQL directly:** `sqlite3 data/style_signal.sqlite` and query the tables above.
-- **Python:** `from fashion_trend.storage.queries import rising_brands, new_brands, brand_history`.
+- **Python:** `from style_signal.storage.queries import rising_brands, new_brands, brand_history`.
 - **REST API:** see [API.md](./API.md).
 - **Pandas:** `pandas.read_sql("SELECT * FROM products WHERE snapshot_id = ?", conn, params=[42])`.
 

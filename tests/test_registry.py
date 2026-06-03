@@ -1,8 +1,8 @@
 import unittest
 
 import _path  # noqa: F401
-from fashion_trend.registry import get_adapter, list_sources
-from fashion_trend.sources.kream.adapter import KreamAdapter
+from style_signal.registry import get_adapter, list_sources
+from style_signal.sources.kream.adapter import KreamAdapter
 
 
 class RegistryTest(unittest.TestCase):

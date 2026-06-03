@@ -22,7 +22,7 @@ Expose the data over a tiny **FastAPI** REST service so the project becomes an o
 ## Module layout (additions only)
 
 ```
-src/fashion_trend/
+src/style_signal/
 ├── storage/
 │   ├── __init__.py
 │   ├── db.py              # connection, schema bootstrap
@@ -88,8 +88,8 @@ INSERT OR IGNORE INTO schema_version (version) VALUES (1);
 Add two commands:
 
 ```
-python -m fashion_trend store --input artifacts/kream-result.tagged.json
-python -m fashion_trend query --help
+python -m style_signal store --input artifacts/kream-result.tagged.json
+python -m style_signal query --help
 ```
 
 `store`:
@@ -98,13 +98,13 @@ python -m fashion_trend query --help
 - Prints `{"snapshot_id": N, "product_count": M}`.
 
 `query`:
-- `python -m fashion_trend query rising-brands --source kream --window 7 --curation top100 --gender men --limit 10`
+- `python -m style_signal query rising-brands --source kream --window 7 --curation top100 --gender men --limit 10`
   → Brands that gained the most rank/appearances in the last 7 days.
-- `python -m fashion_trend query new-brands --source kream --window 7`
+- `python -m style_signal query new-brands --source kream --window 7`
   → Brands present today but absent in the prior window.
-- `python -m fashion_trend query brand-history --source kream --brand "new balance" --days 30`
+- `python -m style_signal query brand-history --source kream --brand "new balance" --days 30`
   → Time series of that brand's min/avg rank and appearance count by day.
-- `python -m fashion_trend query snapshots --source kream --date 2026-04-10`
+- `python -m style_signal query snapshots --source kream --date 2026-04-10`
   → List snapshots for a date.
 
 Each query prints JSON. Document the exact shapes in `docs/API.md` (codex writes).
@@ -112,12 +112,12 @@ Each query prints JSON. Document the exact shapes in `docs/API.md` (codex writes
 Also add `--store` flag to `fetch`:
 
 ```
-python -m fashion_trend fetch --source kream --curation top100 --gender men --store
+python -m style_signal fetch --source kream --curation top100 --gender men --store
 ```
 
 This fetches, optionally tags, and writes to the DB in one shot.
 
-## REST API (`src/fashion_trend/api/`)
+## REST API (`src/style_signal/api/`)
 
 FastAPI app. Endpoints (all GET, all return JSON):
 
@@ -137,7 +137,7 @@ Every response is a plain JSON object; no HTML, no auth headers required. Enable
 Run command:
 
 ```
-python -m fashion_trend serve --host 0.0.0.0 --port 8787
+python -m style_signal serve --host 0.0.0.0 --port 8787
 ```
 
 This delegates to `uvicorn.run(app, ...)`. Only works when the `[api]` extra is installed, otherwise prints a clear install hint and exits 1.
@@ -174,9 +174,9 @@ The README disclaimer still stands. For the SQLite artifact that gets committed 
 
 ## Acceptance criteria
 
-1. `python -m fashion_trend fetch --source kream --curation top100 --gender men --store` succeeds and creates/updates a row in `snapshots` and N rows in `products`.
-2. `python -m fashion_trend query rising-brands --source kream --window 7` returns a JSON list (empty on an empty DB, not an error).
-3. `python -m fashion_trend serve --port 8787` boots FastAPI; `curl localhost:8787/health` returns `{"ok": true}`.
+1. `python -m style_signal fetch --source kream --curation top100 --gender men --store` succeeds and creates/updates a row in `snapshots` and N rows in `products`.
+2. `python -m style_signal query rising-brands --source kream --window 7` returns a JSON list (empty on an empty DB, not an error).
+3. `python -m style_signal serve --port 8787` boots FastAPI; `curl localhost:8787/health` returns `{"ok": true}`.
 4. Re-running the same `fetch --store` on the same UTC day overwrites the same snapshot (verified by row count staying constant).
 5. All storage + API tests pass offline via `python -m unittest discover tests`.
 6. Plain `pip install -e .` still works without FastAPI or google-genai installed.

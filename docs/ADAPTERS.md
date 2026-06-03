@@ -6,13 +6,13 @@ Short guide for adding a new fashion site as a `style-signal` data source. Each 
 
 - You have a real page URL on the target site that returns product listings.
 - The site is scrapable via `scrapling stealthy-fetch` (or you have a plan to extend `fetcher.py`).
-- You understand the [canonical schema](../src/fashion_trend/schema.py) — `Query`, `Product`, `FetchResult`.
+- You understand the [canonical schema](../src/style_signal/schema.py) — `Query`, `Product`, `FetchResult`.
 
 ## Checklist
 
 1. **Copy the stub layout**
    ```
-   src/fashion_trend/sources/<name>/
+   src/style_signal/sources/<name>/
    ├── __init__.py
    ├── adapter.py     # <Name>Adapter
    ├── urls.py        # URL builders + sort mapping
@@ -47,7 +47,7 @@ Short guide for adding a new fashion site as a `style-signal` data source. Each 
    - `tests/test_parsers.py` — load the fixture, assert ≥3 products and required fields populated.
    - Aim for 2–3 new tests per adapter.
 
-7. **Register in `src/fashion_trend/registry.py`**
+7. **Register in `src/style_signal/registry.py`**
    ```python
    from .sources.<name>.adapter import <Name>Adapter
    _ADAPTERS["<name>"] = <Name>Adapter
@@ -60,9 +60,9 @@ Short guide for adding a new fashion site as a `style-signal` data source. Each 
 9. **Run the checks**
    ```bash
    python -m unittest discover tests
-   python -m fashion_trend list-sources
-   python -m fashion_trend describe --source <name>
-   python -m fashion_trend fetch --source <name> --keyword "러닝화" --limit 5
+   python -m style_signal list-sources
+   python -m style_signal describe --source <name>
+   python -m style_signal fetch --source <name> --keyword "러닝화" --limit 5
    ```
    The last command needs a real network connection and `scrapling` installed. If it returns `BLOCKED`, try `--retry-on-block` and confirm the retry logic in your adapter.
 

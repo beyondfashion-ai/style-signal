@@ -1,10 +1,10 @@
 import unittest
 
 import _path  # noqa: F401
-from fashion_trend.schema import Query
-from fashion_trend.sources.kream.adapter import KreamAdapter
-from fashion_trend.sources.musinsa.adapter import MusinsaAdapter
-from fashion_trend.sources.twentyninecm.adapter import TwentyNineCMAdapter
+from style_signal.schema import Query
+from style_signal.sources.kream.adapter import KreamAdapter
+from style_signal.sources.musinsa.adapter import MusinsaAdapter
+from style_signal.sources.twentyninecm.adapter import TwentyNineCMAdapter
 
 
 class UrlBuilderTest(unittest.TestCase):
