@@ -1,1 +1,1 @@
-"""Source adapters for fashion_trend."""
+"""Source adapters for style-signal."""

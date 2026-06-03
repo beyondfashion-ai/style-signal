@@ -1,158 +1,209 @@
-# fashion-trend
+# style-signal
 
-KREAM(크림) 크롤링으로 실시간 패션 트렌드를 수집하고, 다크 에디토리얼 매거진 스타일의 HTML 리포트를 자동 생성하는 Claude Code 스킬.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg)](./pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-11%20offline%20unittest-green.svg)](./tests)
 
-한 문장만 말하면 — `"요즘 인기있는 남성신발"` — 카테고리 파싱 → KREAM 크롤링 → 트렌드 분석 → HTML 리포트까지 약 1분 내 완성된다.
+A pluggable fashion trend signal crawler with a Claude Code skill layer.
 
----
+`style-signal` is an adapter-based Python CLI for collecting public fashion ranking/search pages and returning normalized JSON. The core package currently supports KREAM, Musinsa, and 29CM adapters. The Claude Code skill in this repo can sit on top of that JSON and generate an editorial HTML trend report from natural-language Korean prompts.
 
-## Features
+한국어 요약: KREAM, Musinsa, 29CM 랭킹/검색 데이터를 공통 JSON으로 수집하는 공개 패션 트렌드 CLI이며, Claude Code 스킬 레이어를 통해 자연어 요청 기반 HTML 리포트까지 자동화할 수 있습니다.
 
-- **실시간 KREAM 랭킹 수집** — 남성/여성 인기순, 검색, TOP 100 큐레이션 지원
-- **Claude 기반 트렌드 분석** — 단순 집계가 아닌, 패션 에디터 관점의 인사이트(브랜드 판도, 카테고리 시프트, 가격대 분석, 시즌 인사이트 등)
-- **감각적 HTML 리포트** — 다크 매거진 테마, 모바일 반응형, 상품 카드 그리드
-- **안티봇 우회 크롤링** — Scrapling `stealthy-fetch`로 보호된 페이지 접근
-- **차단 자동 감지 + 재시도** — 30초 대기 후 1회 재시도, 실패 시 사용자에게 안내
+## Project Status
 
----
+| Area | Status | Notes |
+| --- | --- | --- |
+| CLI | Implemented | `list-sources`, `describe`, `fetch` |
+| Output contract | Implemented | Stable JSON to stdout; exit code signals success/failure |
+| Ready adapters | Implemented | `kream`, `musinsa`, `29cm` |
+| Stub adapters | Scaffolded | `ssense`, `farfetch`, `grailed`, `styleshare` return clear TODO errors |
+| Fetching | Implemented | Scrapling `stealthy-fetch`, block detection, optional one-time retry |
+| Tests | Implemented | 11 offline `unittest` cases; no network calls in test suite |
+| Claude Code skill | Implemented | Natural-language workflow in [`SKILL.md`](./SKILL.md) |
+| Static HTML `report` command | Planned | Spec/backlog only; not a core CLI command yet |
+| Vision/style tagging | Planned | See [`docs/PHASE2_VISION_TAGGING.md`](./docs/PHASE2_VISION_TAGGING.md) |
+| SQLite trend store/query | Planned | See [`docs/PHASE3_TIMESERIES_API.md`](./docs/PHASE3_TIMESERIES_API.md) |
+| FastAPI server | Planned | Depends on the SQLite query layer |
 
-## Installation
-
-Claude Code 스킬 폴더에 이 레포를 복사하면 끝.
-
-### 전역 설치 (모든 프로젝트에서 사용)
-
-```bash
-git clone https://github.com/fivetaku/fashion-trend.git ~/.claude/skills/fashion-trend
-```
-
-### 프로젝트 로컬 설치
-
-```bash
-cd <your-project>
-git clone https://github.com/fivetaku/fashion-trend.git .claude/skills/fashion-trend
-```
-
-설치 후 Claude Code를 재시작하거나 새 세션을 열면 스킬이 자동으로 인식된다.
-
-### 의존성
-
-Scrapling과 Playwright 브라우저가 필요하다. **첫 실행 시 스킬이 자동으로 설치**하므로 수동 설치는 필요 없다. 수동으로 설치하려면:
+## Quick Start
 
 ```bash
-pip install "scrapling[all]"
+git clone https://github.com/beyondfashion-ai/style-signal.git
+cd style-signal
+
+python -m venv .venv
+source .venv/bin/activate
+
+pip install -e .
 scrapling install
 ```
 
----
+List available sources:
 
-## Usage
-
-설치 후 Claude Code에서 자연어로 부르면 된다. 키워드를 감지해 자동 실행된다.
-
+```bash
+style-signal list-sources
 ```
+
+Describe a source:
+
+```bash
+style-signal describe --source kream
+```
+
+Fetch a KREAM Top 100 ranking as JSON:
+
+```bash
+style-signal fetch \
+  --source kream \
+  --curation top100 \
+  --gender men \
+  --sort popular \
+  --limit 40 \
+  --retry-on-block
+```
+
+The same commands can also be run through the module entrypoint:
+
+```bash
+python -m fashion_trend list-sources
+python -m fashion_trend describe --source musinsa
+python -m fashion_trend fetch --source 29cm --keyword sneakers --limit 20
+```
+
+The legacy `fashion-trend` console script remains available as an alias during the rename.
+
+`fetch` writes normalized JSON to stdout. If `--raw-output` is omitted, fetched markdown is stored under `artifacts/<source>-result.md` for debugging.
+
+## Use As A Claude Code Skill
+
+Claude Code users can install this repository as a skill and use natural-language Korean prompts such as:
+
+```text
 요즘 인기있는 남성신발 알려줘
 KREAM에서 여자 가방 인기순 보여줘
 남자 스니커즈 트렌드 리포트 만들어줘
 요즘 뭐가 인기야
 ```
 
-명확한 의도(카테고리+성별+정렬)가 이미 들어있으면 추가 질문 없이 바로 크롤링 → 리포트 생성으로 진입한다.
+Global skill install:
 
-결과물은 `trend-report/{YYYYMMDD}-{카테고리}.html`로 저장되고, 브라우저에서 바로 열어볼 수 있다.
-
----
-
-## How it works
-
-```
-사용자 입력
-    ↓
-[Step 0] Scrapling 설치 확인 (최초 1회)
-    ↓
-[Step 1] 의도 파싱 (카테고리/성별/정렬)
-    ↓
-[Step 2] KREAM URL 조합 + stealthy-fetch 크롤링
-    ↓
-[Step 3] 마크다운 파싱 → 상품 데이터 구조화
-    ↓
-[Step 4] (선택) 상위 상품 상세 크롤링 — 프리미엄율 계산
-    ↓
-[Step 5] Claude가 트렌드 인사이트 작성 + HTML 리포트 생성
+```bash
+git clone https://github.com/beyondfashion-ai/style-signal.git ~/.claude/skills/style-signal
 ```
 
-자세한 워크플로우는 [`SKILL.md`](./SKILL.md) 참고.
+Project-local skill install:
 
----
+```bash
+mkdir -p .claude/skills
+git clone https://github.com/beyondfashion-ai/style-signal.git .claude/skills/style-signal
+```
+
+Restart Claude Code or open a new session after installation.
+
+Important distinction: the Python package currently exposes data collection commands only. HTML report generation happens in the Claude Code skill workflow (`SKILL.md` Step 5), where the agent reads the JSON output and writes the report. A standalone dependency-free `report` CLI command is planned but not implemented yet.
+
+## Supported Sources
+
+| Source | Status | Current capability |
+| --- | --- | --- |
+| KREAM | ready | Top 100 curation, gender/sort options, product parsing |
+| Musinsa | ready | Ranking/search URL building and product parsing |
+| 29CM | ready | Search URL building and product parsing |
+| SSENSE | stub | Adapter scaffold only |
+| Farfetch | stub | Adapter scaffold only |
+| Grailed | stub | Adapter scaffold only |
+| StyleShare | stub | Adapter scaffold only |
+
+Use `style-signal describe --source <name>` to inspect the supported options for each adapter.
 
 ## Architecture
 
-`fashion_trend`는 공통 `SourceAdapter` 인터페이스를 통해 URL 생성, Scrapling fetch, markdown parsing을 분리한다.
-`registry.py`가 source name을 adapter class에 매핑하므로 새 소스는 `src/fashion_trend/sources/<name>/adapter.py`를 만들고 registry에 등록하면 된다.
-KREAM, Musinsa, 29CM은 Phase 1에서 URL builder와 parser가 동작하는 ready adapter다.
-SSENSE, Farfetch, Grailed, StyleShare는 등록만 된 stub이며 구현 요청 시 명확한 TODO를 반환한다.
-CLI는 `python -m fashion_trend list-sources`, `describe`, `fetch` 세 명령으로 안정적인 JSON을 stdout에 출력한다.
+The core package separates source-specific behavior behind a common `SourceAdapter` interface:
 
-| Source | Status |
-| --- | --- |
-| KREAM | ready |
-| Musinsa | ready |
-| 29CM | ready |
-| SSENSE | stub |
-| Farfetch | stub |
-| Grailed | stub |
-| StyleShare | stub |
-
----
-
-## File structure
-
-```
-fashion-trend/
-├── README.md
-├── LICENSE
-├── SKILL.md
-├── pyproject.toml
-├── src/fashion_trend/  # Python CLI + adapter registry
-├── tests/              # offline unittest fixtures
-└── scripts/
-    ├── setup.sh
-    └── crawl.sh        # backward-compatible wrapper
+```text
+src/fashion_trend/
+├── cli.py                  # argparse commands and JSON output
+├── fetcher.py              # Scrapling wrapper
+├── registry.py             # source name -> adapter class
+├── schema.py               # Query, Product, FetchResult
+└── sources/
+    ├── base.py             # SourceAdapter contract
+    ├── kream/
+    ├── musinsa/
+    ├── twentyninecm/
+    ├── ssense/
+    ├── farfetch/
+    ├── grailed/
+    └── styleshare/
 ```
 
----
+To add a source, create `src/fashion_trend/sources/<name>/adapter.py`, implement URL building, block detection, and markdown parsing, then register the adapter in `registry.py`. See [`docs/ADAPTERS.md`](./docs/ADAPTERS.md) for the contribution checklist.
+
+## Development
+
+Run the offline test suite:
+
+```bash
+python -m unittest discover tests
+```
+
+Inspect the local registry:
+
+```bash
+PYTHONPATH=src python -m fashion_trend list-sources
+PYTHONPATH=src python -m fashion_trend describe --source kream
+```
+
+The test suite must stay offline. Parser tests should use synthetic or recorded markdown fixtures under `tests/fixtures/`.
+
+## Roadmap
+
+The public roadmap is intentionally narrow and free-source friendly:
+
+| Phase | Scope | Document |
+| --- | --- | --- |
+| Phase 1 | Multi-source adapter architecture | [`docs/PHASE1_REFACTOR_PLAN.md`](./docs/PHASE1_REFACTOR_PLAN.md) |
+| Phase 2 | Optional Gemini vision/style tagging | [`docs/PHASE2_VISION_TAGGING.md`](./docs/PHASE2_VISION_TAGGING.md) |
+| Phase 3 | SQLite snapshots, trend queries, optional FastAPI | [`docs/PHASE3_TIMESERIES_API.md`](./docs/PHASE3_TIMESERIES_API.md) |
+
+Near-term backlog:
+
+1. Clean OSS metadata and docs for the independent `beyondfashion-ai/style-signal` repo.
+2. Add a dependency-free `report` command that renders static HTML from fetch JSON.
+3. Add SQLite snapshot storage and `query rising-brands` before introducing an API server.
+4. Reimplement generic evidence manifests and source-truth guards inspired by KALEI, without carrying private code or private data into this repo.
+5. Promote one global stub adapter, likely `ssense`, to ready status.
+
+See [`docs/NEXT_DEVELOPMENT.md`](./docs/NEXT_DEVELOPMENT.md) and [`docs/OPENSOURCE_ROADMAP.md`](./docs/OPENSOURCE_ROADMAP.md) for the working backlog.
+
+## Data Ethics And Disclaimer
+
+This project is intended for personal learning, research, and open-source tooling experiments.
+
+- Follow each target site's Terms of Service, robots.txt, rate limits, and applicable law.
+- Do not run high-volume or abusive scraping workloads.
+- Store image URLs only; do not redistribute image bytes or product media assets.
+- Generated reports or datasets may include third-party brands, product names, images, prices, and links owned by their respective rightsholders.
+- The code is MIT licensed. A separate dataset/output license is planned before publishing reusable dataset artifacts.
+
+In short: use this as a responsible research tool, not as a way to republish or commercialize scraped third-party content.
 
 ## Requirements
 
-- macOS / Linux (Windows는 테스트되지 않음)
-- Python 3.11 이상
-- `pip`, `bash`
-- Claude Code CLI
+- Python 3.11+
+- macOS or Linux
+- `pip`
+- Scrapling and Playwright browsers (`pip install -e .` plus `scrapling install`)
+- Claude Code CLI only if you want to use the skill workflow
 
-`setup.sh`는 현재 macOS의 `~/Library/Python/3.x/bin` 경로를 우선 탐지한다. Linux/다른 환경에서는 `command -v scrapling` 폴백을 사용한다.
-
----
-
-## Disclaimer (중요)
-
-이 스킬은 **개인 학습 및 리서치 목적**으로만 사용해야 한다.
-
-- **상업적 이용 및 재배포 금지** — 생성된 리포트에는 KREAM CDN의 상품 이미지와 브랜드 정보가 포함되며, 이에 대한 저작권은 원 권리자에게 있다.
-- **KREAM 이용약관 준수 책임은 사용자에게 있다** — 이 스킬은 Scrapling의 `stealthy-fetch`로 봇 탐지를 우회하지만, 대상 사이트의 ToS 및 `robots.txt`를 확인하고 준수할 책임은 사용자 본인에게 있다.
-- **과도한 요청 금지** — 스킬은 상세 크롤링 시 요청 간 2초 간격을 기본으로 두지만, 짧은 시간 내 반복 실행은 대상 사이트에 부담을 줄 수 있으므로 자제한다.
-- **법적 책임** — 이 스킬 사용으로 인해 발생하는 모든 법적/윤리적 이슈는 사용자에게 있으며, 이 레포의 작성자는 어떠한 책임도 지지 않는다.
-
-요약하면 — **내가 공부/실험용으로 쓰는 건 OK, 크롤링 결과물을 공개 배포하거나 상업적으로 쓰는 건 NO**.
-
----
+Windows is not currently tested.
 
 ## License
 
-[MIT](./LICENSE)
-
----
+Code is licensed under [MIT](./LICENSE).
 
 ## Credits
 
-- [Scrapling](https://github.com/D4Vinci/Scrapling) — 안티봇 우회 웹 크롤링 프레임워크
-- [Claude Code](https://claude.com/claude-code) — AI 기반 개발 환경
+- [Scrapling](https://github.com/D4Vinci/Scrapling) for browser-backed fetching.
+- [Claude Code](https://claude.com/claude-code) for the optional skill workflow.

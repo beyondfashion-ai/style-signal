@@ -1,13 +1,14 @@
 [project]
-name = "fashion-trend"
+name = "style-signal"
 version = "0.2.0"
-description = "Pluggable fashion trend crawler + report skill"
+description = "Open fashion trend signal crawler + report skill"
 requires-python = ">=3.11"
 dependencies = [
     "scrapling[all]>=0.3",
 ]
 
 [project.scripts]
+style-signal = "fashion_trend.cli:main"
 fashion-trend = "fashion_trend.cli:main"
 
 [build-system]

@@ -174,7 +174,7 @@ def cmd_fetch(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="fashion-trend")
+    parser = argparse.ArgumentParser(prog="style-signal")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     list_parser = subparsers.add_parser("list-sources")

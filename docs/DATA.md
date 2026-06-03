@@ -1,4 +1,4 @@
-# fashion-trend Data Schema and Ethics
+# style-signal Data Schema and Ethics
 
 Phase 3 persists every fetch as a snapshot in a local SQLite file. This document is the canonical reference for the schema, the ethical stance, and the dataset license.
 
@@ -14,10 +14,10 @@ Firebase, Postgres, and Supabase were all rejected for these reasons (see [OPENS
 ## Default location
 
 ```
-./data/fashion_trend.sqlite
+./data/style_signal.sqlite
 ```
 
-Override with `--db PATH` on the CLI or `FASHION_TREND_DB` env var. Parent directory is created on first write.
+Override with `--db PATH` on the CLI or `STYLE_SIGNAL_DB` env var. Parent directory is created on first write.
 
 ## Tables
 
@@ -116,7 +116,7 @@ DELETE FROM snapshots WHERE fetch_date < date('now', '-90 days');
 
 ## Consuming the data
 
-- **SQL directly:** `sqlite3 data/fashion_trend.sqlite` and query the tables above.
+- **SQL directly:** `sqlite3 data/style_signal.sqlite` and query the tables above.
 - **Python:** `from fashion_trend.storage.queries import rising_brands, new_brands, brand_history`.
 - **REST API:** see [API.md](./API.md).
 - **Pandas:** `pandas.read_sql("SELECT * FROM products WHERE snapshot_id = ?", conn, params=[42])`.

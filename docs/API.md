@@ -1,4 +1,4 @@
-# fashion-trend REST API
+# style-signal REST API
 
 Phase 3 adds an optional FastAPI server exposing the SQLite snapshot database as a public read-only REST API. This document is the implementation contract — Phase 3 code must match these shapes exactly.
 
@@ -9,7 +9,7 @@ pip install -e ".[api]"
 python -m fashion_trend serve --host 0.0.0.0 --port 8787
 ```
 
-`--db PATH` overrides the default `./data/fashion_trend.sqlite`. `FASHION_TREND_DB` env var has the same effect.
+`--db PATH` overrides the default `./data/style_signal.sqlite`. `STYLE_SIGNAL_DB` env var has the same effect.
 
 CORS is permissive (`allow_origins=["*"]`) — this is an open dataset, no auth, read-only.
 
@@ -26,7 +26,7 @@ CORS is permissive (`allow_origins=["*"]`) — this is an open dataset, no auth,
 ### `GET /health`
 
 ```json
-{"ok": true, "version": "0.2.0", "db": "/path/to/fashion_trend.sqlite"}
+{"ok": true, "version": "0.2.0", "db": "/path/to/style_signal.sqlite"}
 ```
 
 Always 200 if the process is up and the DB file is reachable.

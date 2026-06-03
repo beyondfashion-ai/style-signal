@@ -1,5 +1,5 @@
 #!/bin/bash
-# fashion-trend 스킬 — 환경 설정 스크립트
+# style-signal 스킬 — 환경 설정 스크립트
 # Scrapling 설치 확인 + PATH 탐지 + 브라우저 설치
 
 set -e

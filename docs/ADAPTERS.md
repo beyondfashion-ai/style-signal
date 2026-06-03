@@ -1,6 +1,6 @@
 # Contributing a New Source Adapter
 
-Short guide for adding a new fashion site as a `fashion-trend` data source. Each adapter is ~150 lines of Python.
+Short guide for adding a new fashion site as a `style-signal` data source. Each adapter is ~150 lines of Python.
 
 ## Prerequisites
 

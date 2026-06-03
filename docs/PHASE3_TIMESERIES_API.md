@@ -34,7 +34,7 @@ src/fashion_trend/
     └── routes.py          # endpoints
 ```
 
-Default DB path: `./data/fashion_trend.sqlite` (create parent dir on demand). Override via `FASHION_TREND_DB` env var or `--db` CLI flag.
+Default DB path: `./data/style_signal.sqlite` (create parent dir on demand). Override via `STYLE_SIGNAL_DB` env var or `--db` CLI flag.
 
 ## Schema
 

@@ -1,6 +1,6 @@
-# fashion-trend Open-Source Roadmap
+# style-signal Open-Source Roadmap
 
-> This fork turns the original KREAM-only Claude Code skill into a pluggable, open, free-to-run fashion trend intelligence toolkit.
+> This independent project turns a KREAM-first Claude Code skill into a pluggable, open, free-to-run fashion trend signal toolkit.
 
 ## Scope (locked)
 

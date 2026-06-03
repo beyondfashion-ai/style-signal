@@ -27,7 +27,7 @@ The Claude Code skill must keep working with no user-visible regression.
 ## Target file layout
 
 ```
-fashion-trend/
+style-signal/
 ├── SKILL.md                    # updated Step 2/3 to use Python CLI
 ├── README.md                   # add “Architecture” section + adapter list
 ├── LICENSE                     # unchanged
@@ -339,15 +339,16 @@ Add a top-level `status` field to the `describe` output: `"ready"` for kream/mus
 
 ```toml
 [project]
-name = "fashion-trend"
+name = "style-signal"
 version = "0.2.0"
-description = "Pluggable fashion trend crawler + report skill"
+description = "Open fashion trend signal crawler + report skill"
 requires-python = ">=3.11"
 dependencies = [
     "scrapling[all]>=0.3",
 ]
 
 [project.scripts]
+style-signal = "fashion_trend.cli:main"
 fashion-trend = "fashion_trend.cli:main"
 
 [build-system]

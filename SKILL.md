@@ -1,6 +1,6 @@
 ---
-name: fashion-trend
-description: This skill should be used when the user asks to "요즘 뭐가 인기야", "패션 트렌드 알려줘", "크림 인기 상품", "KREAM 트렌드", "신발 트렌드", "인기 스니커즈", "남자 인기 상품", "여자 인기 상품", "트렌드 리포트 만들어줘", "fashion trend". KREAM 크롤링으로 실시간 패션 트렌드를 수집하고 이미지 포함 HTML 리포트를 자동 생성합니다. Make sure to use this skill whenever the user mentions fashion trends, popular items, KREAM, or trend reports.
+name: style-signal
+description: This skill should be used when the user asks to "요즘 뭐가 인기야", "패션 트렌드 알려줘", "크림 인기 상품", "KREAM 트렌드", "신발 트렌드", "인기 스니커즈", "남자 인기 상품", "여자 인기 상품", "트렌드 리포트 만들어줘", "fashion trend", or "style signal". KREAM 크롤링으로 실시간 패션 트렌드 신호를 수집하고 이미지 포함 HTML 리포트를 자동 생성합니다. Make sure to use this skill whenever the user mentions fashion trends, style signals, popular items, KREAM, or trend reports.
 ---
 
 # 패션 트렌드 큐레이션

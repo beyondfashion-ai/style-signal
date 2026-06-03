@@ -8,7 +8,7 @@ After a fetch, optionally tag each product's image with style / color / silhouet
 
 ## Free-source constraints
 
-- **Gemini 2.5 Flash only** via `google-genai` SDK — free tier gives 10 RPM / 250 req/day as of 2026-04, which covers a full daily fashion-trend run (typically ≤ 40 images).
+- **Gemini 2.5 Flash only** via `google-genai` SDK — free tier gives 10 RPM / 250 req/day as of 2026-04, which covers a full daily style-signal run (typically <= 40 images).
 - **No paid APIs.** No OpenAI, no Claude vision, no Replicate.
 - **No image storage.** Send the CDN URL directly to Gemini — do not download, do not cache to disk in phase 2 (phase 3 DB covers persistence).
 - **Fallback is a silent no-op** — if `GEMINI_API_KEY` missing or quota exceeded, `tags` stays empty and the fetch still succeeds. Never block the core fetch flow on tagging.
@@ -76,7 +76,7 @@ class Tagger(ABC):
 ## Gemini implementation (`tagging/gemini.py`)
 
 - Use `google-genai` (the newer SDK, not `google-generativeai`). Add to `pyproject.toml` as an **optional** dependency group: `[project.optional-dependencies] tagging = ["google-genai>=0.3"]`. Core install must not pull it.
-- Lazy import — if the package isn't installed, `GeminiVisionTagger.__init__` raises a clear `ImportError` saying `pip install "fashion-trend[tagging]"`.
+- Lazy import — if the package isn't installed, `GeminiVisionTagger.__init__` raises a clear `ImportError` saying `pip install "style-signal[tagging]"`.
 - API key: env var `GEMINI_API_KEY`. If missing, raise `TaggerNotConfigured`.
 - Rate limit: built-in simple token bucket at 8 req/min (leave 20% headroom under free tier).
 - Retry: on 429 or 5xx, exponential backoff 2s/4s/8s, max 3 attempts, then return `None`.
